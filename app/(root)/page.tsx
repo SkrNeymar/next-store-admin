@@ -1,9 +1,18 @@
-import { Button } from "@/components/ui/button"
+"use client"
+
+import { Modal } from "@/components/ui/modal"
+import { useStoreModal } from "@/hooks/useStoreModal"
+import { useEffect } from "react"
 
 export default function SetupPage() {
-  return (
-    <div className="p-4">
-      This is a protected page. You can only see this if you're signed in.
-    </div>
-  )
+  const onOpen = useStoreModal((state) => state.onOpen)
+  const isOpen = useStoreModal((state) => state.isOpen)
+
+  useEffect(() => {
+    if (!isOpen) {
+      onOpen()
+    }
+  }, [isOpen, onOpen])
+
+  return <div className="p-4">Root Page</div>
 }
