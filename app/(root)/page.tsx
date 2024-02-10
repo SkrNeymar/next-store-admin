@@ -1,9 +1,9 @@
 import { Button } from "@/components/ui/button"
 
-export default function Home() {
+export default function SetupPage() {
   return (
     <div className="p-4">
-      <Button>Click me</Button>
+      This is a protected page. You can only see this if you're signed in.
     </div>
   )
 }
