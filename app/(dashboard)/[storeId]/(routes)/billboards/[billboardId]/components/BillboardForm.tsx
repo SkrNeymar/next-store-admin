@@ -23,8 +23,6 @@ import {
 import { Input } from "@/components/ui/input"
 import ImageUpload from "@/components/ui/image-upload"
 import { AlertModal } from "@/components/modals/alertModal"
-import { ApiAlert } from "@/components/ui/api-alert"
-import { useOrigin } from "@/hooks/useOrigin"
 
 interface BillboardFormProps {
   initialData: Billboard | null
@@ -40,7 +38,6 @@ type BillboardFormValues = z.infer<typeof formSchema>
 const BillboardForm: React.FC<BillboardFormProps> = ({ initialData }) => {
   const params = useParams()
   const router = useRouter()
-  const origin = useOrigin()
 
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -88,7 +85,7 @@ const BillboardForm: React.FC<BillboardFormProps> = ({ initialData }) => {
         `/api/${params.storeId}/billboards/${params.billboardId}`
       )
       router.refresh()
-      router.push("/")
+      router.push(`/${params.storeId}/billboards`)
       toast.success("Billboard deleted.")
     } catch (error) {
       toast.error("Make sure you removed all categories first.")
@@ -168,7 +165,6 @@ const BillboardForm: React.FC<BillboardFormProps> = ({ initialData }) => {
           </Button>
         </form>
       </Form>
-      <Separator />
     </>
   )
 }
