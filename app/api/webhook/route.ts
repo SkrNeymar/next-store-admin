@@ -3,7 +3,6 @@ import {headers} from 'next/headers'
 import { stripe } from "@/lib/stripe";
 import { NextResponse } from "next/server";
 import prismadb from "@/lib/prismadb";
-import { tr } from "date-fns/locale";
 
 export async function POST(req: Request) {
   const body = await req.text();
