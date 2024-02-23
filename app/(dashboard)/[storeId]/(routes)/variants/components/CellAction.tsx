@@ -1,7 +1,7 @@
 "use client"
 import { useParams, useRouter } from "next/navigation"
 import { toast } from "react-hot-toast"
-import { Copy, Edit, MoreHorizontal, PackageSearch, Trash } from "lucide-react"
+import { Copy, Edit, MoreHorizontal, Trash } from "lucide-react"
 import { useState } from "react"
 import axios from "axios"
 
@@ -67,14 +67,6 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
           <DropdownMenuItem onClick={() => onCopy(data.id)}>
             <Copy className="mr-2 h-4 w-4" />
             Copy Id
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() =>
-              router.push(`/${params.storeId}/products/${data.id}/variants`)
-            }
-          >
-            <PackageSearch className="mr-2 h-4 w-4" />
-            Variants
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() =>

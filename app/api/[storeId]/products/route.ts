@@ -10,8 +10,6 @@ export async function POST(req: Request, {params}: {params: {storeId: string}}) 
       name,
       price,
       categoryId,
-      sizeId,
-      colorId,
       images,
       isFeatured,
       isArchived
@@ -31,14 +29,6 @@ export async function POST(req: Request, {params}: {params: {storeId: string}}) 
 
     if (!categoryId) {
       return new NextResponse("Category id is required", { status: 400 })
-    }
-
-    if (!sizeId) {
-      return new NextResponse("Size id is required", { status: 400 })
-    }
-
-    if (!colorId) {
-      return new NextResponse("Color id is required", { status: 400 })
     }
 
     if (!images || images.length === 0) {
@@ -65,8 +55,6 @@ export async function POST(req: Request, {params}: {params: {storeId: string}}) 
         name,
         price,
         categoryId,
-        sizeId,
-        colorId,
         images: {
           createMany: {
             data: [...images.map((image: { url: string}) => image)]
@@ -90,8 +78,7 @@ export async function GET(req: Request, {params}: {params: {storeId: string}}) {
     const { searchParams } = new URL(req.url)
     const isFeatured = searchParams.get("isFeatured")
     const categoryId = searchParams.get("categoryId") || undefined
-    const sizeId = searchParams.get("sizeId") || undefined
-    const colorId = searchParams.get("colorId") || undefined
+
     if (!params.storeId) {
       return new NextResponse("Store id is required", { status: 400 })
     }
@@ -100,16 +87,13 @@ export async function GET(req: Request, {params}: {params: {storeId: string}}) {
       where: {
         storeId: params.storeId,
         categoryId,
-        sizeId,
-        colorId,
         isFeatured: isFeatured ? true : undefined,
         isArchived: false
       },
       include: {
         images: true,
         category: true,
-        size: true,
-        color: true
+        variants: true
       },
       orderBy: {
         createdAt: "desc"
