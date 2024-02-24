@@ -180,7 +180,7 @@ const VariantsForm: React.FC<VariantsFormProps> = ({
               >
                 <FormField
                   control={form.control}
-                  name="sizeId"
+                  name={`variants[${index}].sizeId` as any}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Size</FormLabel>
@@ -212,7 +212,7 @@ const VariantsForm: React.FC<VariantsFormProps> = ({
                 />
                 <FormField
                   control={form.control}
-                  name="colorId"
+                  name={`variants[${index}].colorId`}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Color</FormLabel>
@@ -244,7 +244,7 @@ const VariantsForm: React.FC<VariantsFormProps> = ({
                 />
                 <FormField
                   control={form.control}
-                  name="quantity"
+                  name={`variants[${index}].quantity`}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Quantity</FormLabel>
