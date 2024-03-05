@@ -2,7 +2,7 @@
 import * as z from "zod"
 import { useState } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
+import { useForm, useFieldArray, Controller, useWatch } from "react-hook-form"
 import { Trash } from "lucide-react"
 import { Category, Color, Image, Product, Size, Variant } from "@prisma/client"
 import toast from "react-hot-toast"
@@ -33,6 +33,14 @@ import ImageUpload from "@/components/ui/image-upload"
 import { AlertModal } from "@/components/modals/alertModal"
 import { Checkbox } from "@/components/ui/checkbox"
 import { cn } from "@/lib/utils"
+
+type FormValues = {
+  variants: {
+    sizeId: string
+    colorId: string
+    quantity: number
+  }[]
+}
 
 interface ProductFormProps {
   initialData: Variant
@@ -66,15 +74,26 @@ const VariantsForm: React.FC<ProductFormProps> = ({
     : "Variants created."
   const actionLabel = initialData ? "Save changes" : "Create"
 
-  const form = useForm<ProductFormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: initialData
-      ? { ...initialData }
-      : {
-          quantity: 1,
+  const {
+    register,
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormValues>({
+    defaultValues: {
+      variants: [
+        {
           sizeId: "",
           colorId: "",
+          quantity: 1,
         },
+      ],
+    },
+    mode: "onBlur",
+  })
+  const { fields, append, remove } = useFieldArray({
+    name: "variants",
+    control,
   })
 
   // const onSubmit = async (values: ProductFormValues) => {
@@ -98,9 +117,7 @@ const VariantsForm: React.FC<ProductFormProps> = ({
   //   }
   // }
 
-  const onSubmit = async (values: ProductFormValues) => {
-    console.log(values)
-  }
+  const onSubmit = (data: FormValues) => console.log(data)
 
   const onDelete = async () => {
     try {
@@ -129,111 +146,98 @@ const VariantsForm: React.FC<ProductFormProps> = ({
         <Heading title={title} description={description} />
       </div>
       <Separator />
-      <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-8 w-full"
-        >
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <FormField
-              control={form.control}
-              name="sizeId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Size</FormLabel>
-                  <Select
-                    disabled={loading}
-                    onValueChange={field.onChange}
-                    value={field.value}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        {fields.map((field, index) => {
+          return (
+            <div key={field.id}>
+              <section className={"section"} key={field.id}>
+                <Controller
+                  name={`variants.${index}.sizeId`}
+                  control={control}
+                  defaultValue=""
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      onValueChange={field.onChange}
+                      value={field.value}
+                    >
                       <SelectTrigger>
                         <SelectValue
                           defaultValue={field.value}
                           placeholder="Select a size"
                         />
                       </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {sizes.map((size) => (
-                        <SelectItem key={size.id} value={size.id}>
-                          {size.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="colorId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Color</FormLabel>
-                  <Select
-                    disabled={loading}
-                    onValueChange={field.onChange}
-                    value={field.value}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue
-                          defaultValue={field.value}
-                          placeholder="Select a color"
-                        />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {colors.map((color) => (
-                        <SelectItem key={color.id} value={color.id}>
-                          {color.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="quantity"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Quantity</FormLabel>
-                  <FormControl>
-                    <Input
-                      disabled={loading}
-                      placeholder="1"
-                      type="number"
+                      <SelectContent>
+                        {"Select a size"}
+                        {sizes.map((size) => (
+                          <SelectItem key={size.id} value={size.id}>
+                            {size.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+
+                <Controller
+                  name={`variants.${index}.colorId`}
+                  control={control}
+                  defaultValue=""
+                  render={({ field }) => (
+                    <Select
                       {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <div className="flex flex-start items-end">
-              <Button
-                disabled={loading}
-                variant="destructive"
-                size="icon"
-                onClick={() => {}}
-              >
-                <Trash className="h-4 w-4" />
-              </Button>
+                      onValueChange={field.onChange}
+                      value={field.value}
+                    >
+                      <SelectTrigger>
+                        {" "}
+                        {/* Trigger to open select options */}
+                        <SelectValue /> {/* Display selected value */}
+                      </SelectTrigger>
+                      <SelectContent>
+                        {" "}
+                        {/* Container for options */}
+                        {colors.map((color) => (
+                          <SelectItem key={color.id} value={color.id}>
+                            {color.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                <Input
+                  disabled={loading}
+                  placeholder="1"
+                  type="number"
+                  {...register(`variants.${index}.quantity` as const, {
+                    valueAsNumber: true,
+                    required: true,
+                  })}
+                />
+
+                <button type="button" onClick={() => remove(index)}>
+                  DELETE
+                </button>
+              </section>
             </div>
-            <div></div>
-          </div>
-          <Button disabled={loading} className="ml-auto" type="submit">
-            {actionLabel}
-          </Button>
-        </form>
-      </Form>
+          )
+        })}
+
+        <button
+          type="button"
+          onClick={() =>
+            append({
+              sizeId: "",
+              colorId: "",
+              quantity: 1,
+            })
+          }
+        >
+          APPEND
+        </button>
+        <input type="submit" />
+      </form>
     </>
   )
 }
