@@ -10,10 +10,6 @@ const VariantsPage = async ({
     where: {
       productId: params.productId,
     },
-    include: {
-      size: true,
-      color: true,
-    },
   })
 
   const sizes = await prismadb.size.findMany({

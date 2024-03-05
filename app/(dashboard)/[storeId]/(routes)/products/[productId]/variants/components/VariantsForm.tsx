@@ -87,7 +87,7 @@ const VariantsForm: React.FC<ProductFormProps> = ({
 
   const methods = useForm<FormValues>({
     defaultValues: {
-      variants: [
+      variants: initialData || [
         {
           sizeId: "",
           colorId: "",
@@ -104,52 +104,30 @@ const VariantsForm: React.FC<ProductFormProps> = ({
     control: methods.control,
   })
 
-  // const onSubmit = async (values: ProductFormValues) => {
-  //   try {
-  //     setLoading(true)
-  //     if (initialData) {
-  //       await axios.patch(
-  //         `/api/${params.storeId}/products/${params.productId}`,
-  //         values
-  //       )
-  //     } else {
-  //       await axios.post(`/api/${params.storeId}/products`, values)
-  //     }
-  //     router.refresh()
-  //     router.push(`/${params.storeId}/products`)
-  //     toast.success(toastSuccessMessage)
-  //   } catch (error) {
-  //     toast.error("Something went wrong.")
-  //   } finally {
-  //     setLoading(false)
-  //   }
-  // }
-
-  const onSubmit = (data: FormValues) => console.log(data)
-
-  const onDelete = async () => {
+  const onSubmit = async (values: FormValues) => {
     try {
       setLoading(true)
-      await axios.delete(`/api/${params.storeId}/products/${params.productId}`)
+      // if (initialData) {
+
+      // } else {
+      //   await axios.post(`/api/${params.storeId}/products`, values)
+      // }
+      await axios.patch(
+        `/api/${params.storeId}/products/${params.productId}/variants`,
+        values
+      )
       router.refresh()
       router.push(`/${params.storeId}/products`)
-      toast.success("Product deleted.")
+      toast.success(toastSuccessMessage)
     } catch (error) {
       toast.error("Something went wrong.")
     } finally {
       setLoading(false)
-      setOpen(false)
     }
   }
 
   return (
     <>
-      <AlertModal
-        isOpen={open}
-        onClose={() => setOpen(false)}
-        onConfirm={onDelete}
-        loading={loading}
-      />
       <div className="flex items-center justify-between">
         <Heading title={title} description={description} />
       </div>
