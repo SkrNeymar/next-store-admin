@@ -58,7 +58,7 @@ const formSchema = z.object({
     z.object({
       sizeId: z.string().min(1, "Size is required"),
       colorId: z.string().min(1, "Color is required"),
-      quantity: z.number().min(1, "Quantity must be at least 1"),
+      quantity: z.coerce.number().int().min(1, "Quantity must be at least 1"),
     })
   ),
 })
@@ -101,8 +101,6 @@ const VariantsForm: React.FC<ProductFormProps> = ({
     name: "variants",
     control: methods.control,
   })
-
-  const { errors } = methods.formState
 
   // const onSubmit = async (values: ProductFormValues) => {
   //   try {
@@ -165,90 +163,81 @@ const VariantsForm: React.FC<ProductFormProps> = ({
                 key={field.id}
                 className="grid grid-cols-1 md:grid-cols-4 gap-8"
               >
-                <FormItem>
-                  <FormLabel>Size</FormLabel>
-                  <Controller
-                    name={`variants.${index}.sizeId`}
-                    control={methods.control}
-                    render={({ field }) => (
-                      <Select
+                <FormField
+                  control={methods.control}
+                  name={`variants.${index}.sizeId`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Size</FormLabel>
+                      <Controller
                         {...field}
-                        onValueChange={field.onChange}
-                        value={field.value}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a size" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {sizes.map((size) => (
-                            <SelectItem key={size.id} value={size.id}>
-                              {size.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                  {errors.variants && errors.variants[index]?.sizeId && (
-                    <FormMessage>
-                      {errors.variants[index].sizeId!.message}
-                    </FormMessage>
+                        render={({ field: controllerField }) => (
+                          <Select
+                            {...field}
+                            onValueChange={field.onChange}
+                            value={field.value}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a size" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {sizes.map((size) => (
+                                <SelectItem key={size.id} value={size.id}>
+                                  {size.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      />
+                      <FormMessage />
+                    </FormItem>
                   )}
-                </FormItem>
+                />
 
-                <FormItem>
-                  <FormLabel>Color</FormLabel>
-                  <Controller
-                    name={`variants.${index}.colorId`}
-                    control={methods.control}
-                    render={({ field }) => (
-                      <Select
+                <FormField
+                  control={methods.control}
+                  name={`variants.${index}.colorId`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Color</FormLabel>
+                      <Controller
                         {...field}
-                        onValueChange={field.onChange}
-                        value={field.value}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a size" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {colors.map((color) => (
-                            <SelectItem key={color.id} value={color.id}>
-                              {color.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                  {errors.variants && errors.variants[index]?.colorId && (
-                    <FormMessage>
-                      {errors.variants[index].colorId.message}
-                    </FormMessage>
+                        render={({ field: controllerField }) => (
+                          <Select
+                            {...field}
+                            onValueChange={field.onChange}
+                            value={field.value}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a size" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {colors.map((color) => (
+                                <SelectItem key={color.id} value={color.id}>
+                                  {color.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      />
+                      <FormMessage />
+                    </FormItem>
                   )}
-                </FormItem>
+                />
 
-                <FormItem>
-                  <FormLabel>Quantity</FormLabel>
-                  <FormControl>
-                    <Input
-                      disabled={loading}
-                      placeholder="1"
-                      type="number"
-                      {...methods.register(
-                        `variants.${index}.quantity` as const,
-                        {
-                          valueAsNumber: true,
-                          required: true,
-                        }
-                      )}
-                    />
-                  </FormControl>
-                  {errors.variants && errors.variants[index]?.quantity && (
-                    <FormMessage>
-                      {errors.variants[index].quantity.message}
-                    </FormMessage>
+                <FormField
+                  control={methods.control}
+                  name={`variants.${index}.quantity`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Quantity</FormLabel>
+                      <Input {...field} type="number" />
+                      <FormMessage />
+                    </FormItem>
                   )}
-                </FormItem>
+                />
 
                 <div className="flex flex-start items-end">
                   <Button
