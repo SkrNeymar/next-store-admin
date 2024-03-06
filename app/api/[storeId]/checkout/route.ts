@@ -38,6 +38,29 @@ export async function POST(
     },
   })
 
+  if (products.length === 0) {
+    return new NextResponse("Product not found", { status: 400 })
+  }
+
+  const outOfStockProductIds = products
+    .filter((item) => item.quantity === 0)
+    .map((item) => item.id)
+
+  if (outOfStockProductIds.length > 0) {
+    return new NextResponse(
+      JSON.stringify({
+        error: "Out of stock",
+        outOfStockProductIds: outOfStockProductIds,
+      }),
+      {
+        status: 400,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    )
+  }
+
   const line_items: Stripe.Checkout.SessionCreateParams.LineItem[] = []
 
   products.forEach((item) => {
