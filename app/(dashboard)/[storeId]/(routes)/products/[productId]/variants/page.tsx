@@ -9,6 +9,7 @@ const VariantsPage = async ({
   const variants = await prismadb.variant.findMany({
     where: {
       productId: params.productId,
+      isArchived: false,
     },
   })
 

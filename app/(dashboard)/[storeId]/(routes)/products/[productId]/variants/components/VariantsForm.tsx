@@ -58,7 +58,7 @@ const formSchema = z.object({
     z.object({
       sizeId: z.string().min(1, "Size is required"),
       colorId: z.string().min(1, "Color is required"),
-      quantity: z.coerce.number().int().min(1, "Quantity must be at least 1"),
+      quantity: z.coerce.number().int().min(0, "Quantity must be at least 0"),
     })
   ),
 })

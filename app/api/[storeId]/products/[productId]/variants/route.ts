@@ -4,9 +4,8 @@ import { NextResponse } from "next/server"
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { storeId: string, productId: string } }
-){
-
+  { params }: { params: { storeId: string; productId: string } }
+) {
   try {
     const { userId } = auth()
     const body = await req.json()
@@ -22,12 +21,11 @@ export async function PATCH(
 
     const existingVariants = await prismadb.variant.findMany({
       where: { productId: params.productId },
-    });
-    
+    })
 
     for (const variant of variants) {
-      const existingVariant = existingVariants.find(v => v.id === variant.id);
-    
+      const existingVariant = existingVariants.find((v) => v.id === variant.id)
+
       if (existingVariant) {
         // Update existing variant
         await prismadb.variant.update({
@@ -35,9 +33,9 @@ export async function PATCH(
           data: {
             sizeId: variant.sizeId,
             colorId: variant.colorId,
-            quantity: variant.quantity
-          }
-        });
+            quantity: variant.quantity,
+          },
+        })
       } else {
         // Create new variant
         await prismadb.variant.create({
@@ -45,44 +43,45 @@ export async function PATCH(
             productId: params.productId,
             sizeId: variant.sizeId,
             colorId: variant.colorId,
-            quantity: variant.quantity
-          }
-        });
+            quantity: variant.quantity,
+          },
+        })
       }
     }
 
-    const variantIdsToUpdate = variants.map(v => v.id);
+    const variantIdsToUpdate = variants.map((v) => v.id)
     const variantIdsToDelete = existingVariants
-      .filter(v => !variantIdsToUpdate.includes(v.id))
-      .map(v => v.id);
-    
+      .filter((v) => !variantIdsToUpdate.includes(v.id))
+      .map((v) => v.id)
+
     for (const variantId of variantIdsToDelete) {
-      await prismadb.variant.delete({
+      await prismadb.variant.update({
         where: { id: variantId },
-      });
+        data: {
+          isArchived: true,
+        },
+      })
     }
-    
+
     // Send back the updated product with its variants
     const product = await prismadb.product.findUnique({
       where: { id: params.productId },
       include: {
         variants: true,
-      }
-    });
+      },
+    })
 
-    return NextResponse.json(product);
+    return NextResponse.json(product)
   } catch (error) {
-    console.error("[VARIANT PATCH]", error);
-    return new NextResponse("Internal Server Error", { status: 500 });
+    console.error("[VARIANT PATCH]", error)
+    return new NextResponse("Internal Server Error", { status: 500 })
   }
 }
-
 
 export async function GET(
   req: Request,
   { params }: { params: { productId: string } }
-){
-
+) {
   try {
     const { userId } = auth()
 
@@ -98,12 +97,12 @@ export async function GET(
       where: { id: params.productId },
       include: {
         variants: true,
-      }
-    });
+      },
+    })
 
-    return NextResponse.json(product?.variants);
+    return NextResponse.json(product?.variants)
   } catch (error) {
-    console.error("[VARIANTS GET]", error);
-    return new NextResponse("Internal Server Error", { status: 500 });
+    console.error("[VARIANTS GET]", error)
+    return new NextResponse("Internal Server Error", { status: 500 })
   }
 }
