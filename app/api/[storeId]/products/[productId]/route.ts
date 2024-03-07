@@ -2,21 +2,14 @@ import prismadb from "@/lib/prismadb"
 import { auth } from "@clerk/nextjs"
 import { NextResponse } from "next/server"
 
-export async function PATCH (
+export async function PATCH(
   req: Request,
-  { params } : { params: { storeId: string, productId: string } }
-){
+  { params }: { params: { storeId: string; productId: string } }
+) {
   try {
     const { userId } = auth()
     const body = await req.json()
-    const {
-      name,
-      price,
-      categoryId,
-      images,
-      isFeatured,
-      isArchived
-     } = body
+    const { name, price, categoryId, images, isFeatured, isArchived } = body
 
     if (!userId) {
       return new NextResponse("Unauthorized", { status: 401 })
@@ -49,8 +42,8 @@ export async function PATCH (
     const storeByUserId = await prismadb.store.findFirst({
       where: {
         id: params.storeId,
-        userId
-      }
+        userId,
+      },
     })
 
     if (!storeByUserId) {
@@ -64,8 +57,7 @@ export async function PATCH (
         price,
         categoryId,
         images: {
-          deleteMany: {            
-          }
+          deleteMany: {},
         },
         isFeatured,
         isArchived,
@@ -77,30 +69,28 @@ export async function PATCH (
       data: {
         images: {
           createMany: {
-            data: [...images.map((image: { url: string}) => image)]
-          }
-        }
+            data: [...images.map((image: { url: string }) => image)],
+          },
+        },
       },
       include: {
         images: true,
         category: true,
         variants: true,
-      }
+      },
     })
 
     return NextResponse.json(product)
-
-    
   } catch (error) {
     console.log("[PRODUCT PATCH]", error)
     return new NextResponse("Internal Server Error", { status: 500 })
   }
 }
 
-export async function DELETE (
+export async function DELETE(
   req: Request,
-  { params } : { params: { storeId: string, productId: string } }
-){
+  { params }: { params: { storeId: string; productId: string } }
+) {
   try {
     const { userId } = auth()
 
@@ -119,8 +109,8 @@ export async function DELETE (
     const storeByUserId = await prismadb.store.findFirst({
       where: {
         id: params.storeId,
-        userId
-      }
+        userId,
+      },
     })
 
     if (!storeByUserId) {
@@ -132,18 +122,16 @@ export async function DELETE (
     })
 
     return NextResponse.json(product)
-
-    
   } catch (error) {
     console.log("[PRODUCT DELETE]", error)
     return new NextResponse("Internal Server Error", { status: 500 })
   }
 }
 
-export async function GET (
+export async function GET(
   req: Request,
-  { params } : { params: {productId: string } }
-){
+  { params }: { params: { productId: string } }
+) {
   try {
     if (!params.productId) {
       return new NextResponse("Product id is required", { status: 400 })
@@ -154,13 +142,15 @@ export async function GET (
       include: {
         images: true,
         category: true,
-        variants: true,
-      }
+        variants: {
+          where: {
+            AND: [{ isArchived: false }, { quantity: { gt: 0 } }],
+          },
+        },
+      },
     })
 
     return NextResponse.json(product)
-
-    
   } catch (error) {
     console.log("[PRODUCT GET]", error)
     return new NextResponse("Internal Server Error", { status: 500 })
