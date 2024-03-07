@@ -29,6 +29,7 @@ export async function POST(
 
   const products = await prismadb.variant.findMany({
     where: {
+      isArchived: false,
       id: {
         in: productId,
       },
