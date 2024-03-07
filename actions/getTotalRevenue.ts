@@ -4,20 +4,24 @@ export const getTotalRevenue = async (storeId: string) => {
   const paidOrders = await prismadb.order.findMany({
     where: {
       storeId,
-      isPaid: true
+      isPaid: true,
     },
     include: {
       orderItems: {
         include: {
-          product: true
-        }
-      }
-    }
+          variant: {
+            include: {
+              product: true,
+            },
+          },
+        },
+      },
+    },
   })
 
   const totalRevenue = paidOrders.reduce((total, order) => {
     const orderTotal = order.orderItems.reduce((orderTotal, orderItem) => {
-      return orderTotal + orderItem.product.price.toNumber()
+      return orderTotal + orderItem.variant.product.price.toNumber()
     }, 0)
 
     return total + orderTotal

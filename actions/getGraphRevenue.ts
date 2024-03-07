@@ -1,38 +1,42 @@
 import prismadb from "@/lib/prismadb"
 
 interface GraphData {
-  name: string;
-  total: number;
+  name: string
+  total: number
 }
 
 export const getGraphRevenue = async (storeId: string) => {
   const paidOrders = await prismadb.order.findMany({
     where: {
       storeId,
-      isPaid: true
+      isPaid: true,
     },
     include: {
       orderItems: {
         include: {
-          product: true
-        }
-      }
-    }
+          variant: {
+            include: {
+              product: true,
+            },
+          },
+        },
+      },
+    },
   })
 
-  const monthlyRevenue: { [key: number]: number } = {};
+  const monthlyRevenue: { [key: number]: number } = {}
 
   // Grouping the orders by month and summing the revenue
   for (const order of paidOrders) {
-    const month = order.createdAt.getMonth(); // 0 for Jan, 1 for Feb, ...
-    let revenueForOrder = 0;
+    const month = order.createdAt.getMonth() // 0 for Jan, 1 for Feb, ...
+    let revenueForOrder = 0
 
     for (const item of order.orderItems) {
-      revenueForOrder += item.product.price.toNumber();
+      revenueForOrder += item.variant.product.price.toNumber()
     }
 
     // Adding the revenue for this order to the respective month
-    monthlyRevenue[month] = (monthlyRevenue[month] || 0) + revenueForOrder;
+    monthlyRevenue[month] = (monthlyRevenue[month] || 0) + revenueForOrder
   }
 
   // Converting the grouped data into the format expected by the graph
@@ -49,14 +53,12 @@ export const getGraphRevenue = async (storeId: string) => {
     { name: "Oct", total: 0 },
     { name: "Nov", total: 0 },
     { name: "Dec", total: 0 },
-  ];
+  ]
 
   // Filling in the revenue data
   for (const month in monthlyRevenue) {
-    graphData[parseInt(month)].total = monthlyRevenue[parseInt(month)];
+    graphData[parseInt(month)].total = monthlyRevenue[parseInt(month)]
   }
 
-  return graphData;
-
-
+  return graphData
 }
