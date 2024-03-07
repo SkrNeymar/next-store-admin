@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
 import { ClerkProvider } from "@clerk/nextjs"
+import { Analytics } from "@vercel/analytics/react"
 
 import { ModalProvider } from "@/providers/modalProviders"
 import { ToastProvider } from "@/providers/toastProviders"
@@ -23,6 +24,7 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en">
         <body className={inter.className}>
+          <Analytics />
           <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
             <ToastProvider />
             <ModalProvider />
