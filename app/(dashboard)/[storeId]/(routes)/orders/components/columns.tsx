@@ -6,7 +6,7 @@ export type OrderColumn = {
   id: string
   phone: string
   address: string
-  isPaid: boolean
+  isPaid: string
   totalPrice: string
   products: string
   createdAt: string

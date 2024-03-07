@@ -31,7 +31,7 @@ const OrdersPage = async ({ params }: { params: { storeId: string } }) => {
     id: order.id,
     phone: order.phone,
     address: order.address,
-    isPaid: order.isPaid,
+    isPaid: order.isPaid.toString(),
     products: order.orderItems
       .map(
         (orderItem) =>
@@ -43,7 +43,7 @@ const OrdersPage = async ({ params }: { params: { storeId: string } }) => {
         return total + Number(item.variant.product.price)
       }, 0)
     ),
-    createdAt: format(order.createdAt, "MMMM do, yyyy"),
+    createdAt: format(order.createdAt, "HH:mm:ss MMM do yyyy"),
   }))
 
   return (
