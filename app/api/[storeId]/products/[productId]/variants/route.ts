@@ -1,6 +1,7 @@
 import prismadb from "@/lib/prismadb"
 import { auth } from "@clerk/nextjs"
 import { NextResponse } from "next/server"
+import { Variant } from "@prisma/client"
 
 export async function PATCH(
   req: Request,
@@ -9,7 +10,7 @@ export async function PATCH(
   try {
     const { userId } = auth()
     const body = await req.json()
-    const { variants } = body
+    const variants: Variant[] = body
 
     if (!userId) {
       return new NextResponse("Unauthorized", { status: 401 })
