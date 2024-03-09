@@ -10,7 +10,7 @@ export async function PATCH(
   try {
     const { userId } = auth()
     const body = await req.json()
-    const variants: Variant[] = body
+    const { variants } = body as { variants: Variant[] }
 
     if (!userId) {
       return new NextResponse("Unauthorized", { status: 401 })
@@ -50,7 +50,7 @@ export async function PATCH(
       }
     }
 
-    const variantIdsToUpdate = variants.map((v) => v.id)
+    const variantIdsToUpdate = variants.map((v: Variant) => v.id)
     const variantIdsToDelete = existingVariants
       .filter((v) => !variantIdsToUpdate.includes(v.id))
       .map((v) => v.id)
